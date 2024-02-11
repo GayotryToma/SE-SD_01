@@ -10,6 +10,8 @@ root.geometry("450x560+500+200")
 root.configure(bg="#f4fdfe")
 root.resizable(False,False)
 
+
+
 #icon
 image_icon=PhotoImage(file="images/file-64.png")
 root.iconphoto(False,image_icon)
@@ -25,6 +27,18 @@ receive_image=PhotoImage(file="images/ireceive-64.png")
 receive=Button(root,image=receive_image,bg="#f4fdfe",bd=0)
 receive.place(x=300,y=100)
 
+#label
+Label(root,text="Send",font=('Acumin Variable Concept',17,'bold'),bg="#f4fdfe").place(x=65,y=200)
+Label(root,text="Receive",font=('Acumin Variable Concept',17,'bold'),bg="#f4fdfe").place(x=300,y=200)
+
+background=PhotoImage(file="images/Background.png")
+Label(root,image=background).place(x=-2,y=280)
+
+
+
 
 
 root.mainloop()
+
+
+
