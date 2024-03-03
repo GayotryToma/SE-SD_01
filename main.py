@@ -64,10 +64,43 @@ def Receive():
     main.configure(bg="#f4fdfe")
     main.resizable(False, False)
 
+    def receiver():
+        ID=SenderID.get()
+        filename1=incoming_file.get()
+
+        s=socket.socket()
+        port=8080
+        s.connect((ID,port))
+        file=open(filename1,'wb')
+        file_data=s.recv(1024)
+        file.write(file_data)
+        file.close()
+        print("File has been received successfully")
 
     #icon
-    image_icon1 = PhotoImage(file="images/ireceive-64.png")
+    image_icon1=PhotoImage(file="images/ireceive-64.png")
     main.iconphoto(False,image_icon1)
+
+    Hbackground=PhotoImage(file="images/receiver.png")
+    Label(main,image=Hbackground).place(x=-2,y=0)
+
+    logo=PhotoImage(file='images/profile.png')
+    Label(main,image=logo,bg="#f4fdfe").place(x=10,y=250)
+
+    Label(main,text="Receive",font=('arial',20),bg="#f4fdfe").place(x=100,y=280)
+
+    Label(main,text="Input sender id",font=('arial',10,'bold'),bg="#f4fdfe").place(x=20,y=340)
+    SenderID=Entry(main,width=25,fg="black",border=2,bg='white',font=('arial',15))
+    SenderID.place(x=20,y=370)
+    SenderID.focus()
+
+    Label(main, text="filename for the incoming file:", font=('arial', 10, 'bold'), bg="#f4fdfe").place(x=20, y=420)
+    incoming_file = Entry(main, width=25, fg="black", border=2, bg='white', font=('arial', 15))
+    incoming_file.place(x=20, y=450)
+
+    imageicon=PhotoImage(file="images/arrow.png")
+    rr=Button(main,text="Receive",compound=LEFT,image=imageicon,width=130,bg="#39c790",font="arial 14 bold",command=receiver)
+    rr.place(x=20,y=500)
 
     main.mainloop()
 
@@ -83,7 +116,7 @@ send=Button(root,image=send_image,bg="#f4fdfe",bd=0,command=Send)
 send.place(x=50,y=100)
 
 receive_image=PhotoImage(file="images/ireceive-64.png")
-receive=Button(root,image=receive_image,bg="#f4fdfe",bd=0)
+receive=Button(root,image=receive_image,bg="#f4fdfe",bd=0,command=Receive)
 receive.place(x=300,y=100)
 
 #label
