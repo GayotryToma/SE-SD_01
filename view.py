@@ -1,9 +1,10 @@
 # view.py
-from tkinter import Tk, Button, Entry, Label, PhotoImage, Toplevel, filedialog,LEFT
+from tkinter import Tk,Button, Entry, Label, PhotoImage, Toplevel, filedialog,LEFT
 import os
 from model import FileTransferModel
-from tkinter import messagebox
 import socket
+from tkinter import messagebox
+from tkinter import ttk
 
 class FileTransferView:
     def __init__(self):
@@ -75,16 +76,35 @@ class SendView:
         self.send_button = Button(self.window, text="Send",width=8,height=1 ,font=('arial', 14, 'bold'),bg="#f4fdfe", bd=0, command=self.send_file)
         self.send_button.place(x=300, y=150)
 
+        self.progressbar=ttk.Progressbar(self.window,orient="horizontal",length=300,mode="determinate")
+        self.progressbar.place(x=75,y=200)
+
     def select_file(self):
-        self.filename = filedialog.askopenfilename(initialdir=os.getcwd(),
+        self.filename = filedialog.askopenfilename(parent=self.window,initialdir=os.getcwd(),
                                                    title='Select File',
                                                    filetype=(('file type', '*.txt'), ('all files', '*.*')))
 
     def send_file(self):
-       # if self.filename:
-            self.model.send_file(self.filename)
-       # else:
-            #print("Please select a file.")
+        if self.filename:
+            with open(self.filename, 'rb') as file:
+                file_data = file.read()  # Read file data
+
+                #Update progress bar while sending file
+                total_length= len(file_data)
+                CHUNK_SIZE=10485760
+                num_chunks=total_length// CHUNK_SIZE
+                for i in range(num_chunks+1):
+                    start = i*CHUNK_SIZE
+                    end=min((i+1)*CHUNK_SIZE,total_length)
+                    self.progressbar["value"]=(end/total_length)*100
+                    self.progressbar.update_idletasks()
+
+                    chunk_data=file_data[start:end]
+
+                    self.model.send_file(self.filename, file_data,chunk_data)  # Pass both filename and file data to the model
+            messagebox.showinfo("Success","Data has been transmitted successfully.")
+        else:
+            messagebox.showinfo("No file selected", "Please select a file.")
 
 class ReceiveView:
     def __init__(self, parent, model):
