@@ -91,7 +91,7 @@ class SendView:
 
                 #Update progress bar while sending file
                 total_length= len(file_data)
-                CHUNK_SIZE=10485760
+                CHUNK_SIZE=1024
                 num_chunks=total_length// CHUNK_SIZE
                 for i in range(num_chunks+1):
                     start = i*CHUNK_SIZE
