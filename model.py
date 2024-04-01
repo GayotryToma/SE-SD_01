@@ -16,10 +16,6 @@ class FileTransferModel:
         return file_path
 
     def send_file(self,filename,file_data):
-       ## filename=self.select_file()
-        #if not filename:
-         #   print("No file selected.Exiting...")
-          #  return
 
         s=socket.socket()
         host=socket.gethostname()
@@ -30,19 +26,22 @@ class FileTransferModel:
         conn,addr=s.accept()
 
 
+
         with open(filename,'wb') as file:
-                file.write(file_data)
+                conn.sendall(file_data.getvalue())
 
         print("Data has been transmitted successfully")
 
     def receive_file(self,sender_id,filename):
+        result_message=""
         try:
 
-            s=socket.socket()
-            s.connect((sender_id,self.PORT))
+           s=socket.socket()
+           s.connect((sender_id,self.PORT))
         except socket.error as e:
-            print(f"Error connecting to {sender_id}:{e}")
-            return
+            result_message=(f"Error connecting to {sender_id}:{e}")
+            print(result_message)
+            return result_message
 
 
         with open(filename,'wb') as file:
@@ -52,7 +51,11 @@ class FileTransferModel:
                     break
                 file.write(file_data)
 
-        print("File has been received successfully")
+        result_message = "File has been received successfully"
+        print(result_message)  # Print the success message
+        return result_message
+
+
 
 if __name__ == "__main__":
    model = FileTransferModel()
