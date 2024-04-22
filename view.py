@@ -1,5 +1,5 @@
 # view.py
-from tkinter import Tk,Button, Entry, Label, PhotoImage, Toplevel, filedialog,LEFT
+from tkinter import Tk,Button, Entry, Label, PhotoImage, Toplevel, filedialog,LEFT, StringVar,IntVar,Checkbutton
 import os
 from model import FileTransferModel
 import socket
@@ -7,33 +7,65 @@ from tkinter import messagebox
 from tkinter import ttk
 
 class FileTransferView:
-    def __init__(self):
+    def __init__(self,mode="Login",controller=None, filedialog_module=filedialog):
+        self.filedialog = filedialog_module
         self.root = Tk()
-        self.root.title("FileEDroP")
-        self.root.geometry("450x560+500+200")
+        self.mode = mode
+        self.controller=controller
+        self.root.title("FileEDroP" if mode == "Main" else "Login")
+        self.root.geometry("600x470")
         self.root.configure(bg="#f4fdfe")
         self.root.resizable(False, False)
 
-        image_icon = PhotoImage(file="images/file-64.png")
-        self.root.iconphoto(False, image_icon)
 
-        self.send_button_img = PhotoImage(file="images/send-50.png")
-        self.send_button = Button(self.root, image=self.send_button_img, bg="#f4fdfe", bd=0, command=self.on_send_button_click)
-        self.send_button.place(x=50, y=100)
 
-        self.receive_button_img = PhotoImage(file="images/ireceive-64.png")
-        self.receive_button = Button(self.root, image=self.receive_button_img, bg="#f4fdfe", bd=0, command=self.on_receive_button_click)
-        self.receive_button.place(x=300, y=100)
+        if mode == "Login":
+            self.emailValue = StringVar()
+            self.passValue = StringVar()
+            self.checkValue = IntVar()
 
-        self.send_label = Label(self.root, text="Send", font=('Acumin Variable Concept', 17, 'bold'), bg="#f4fdfe")
-        self.send_label.place(x=65, y=200)
+            Label(self.root, text="Login your account", font="arial 25").pack(pady=50)
 
-        self.receive_label = Label(self.root, text="Receive", font=('Acumin Variable Concept', 17, 'bold'), bg="#f4fdfe")
-        self.receive_label.place(x=300, y=200)
+            Label(self.root, text="Email", font=23).place(x=100, y=200)
+            Label(self.root, text="Password", font=23).place(x=100, y=250)
 
-        self.background_img = PhotoImage(file="images/Background.png")
-        self.background_label = Label(self.root, image=self.background_img)
-        self.background_label.place(x=-2, y=280)
+            self.emailEntry = Entry(self.root, textvariable=self.emailValue, width=30, bd=2, font=20)
+            self.passEntry = Entry(self.root, textvariable=self.passValue, width=30, bd=2, font=20 , show="*")
+            self.emailEntry.place(x=200, y=200)
+            self.passEntry.place(x=200, y=250)
+
+            self.checkbtn = Checkbutton(self.root, text="Remember me?", variable=self.checkValue)
+            self.checkbtn.place(x=200, y=300)
+
+            self.login_button = Button(self.root, text="Login", font=20, width=11, height=2, command=self.login)
+            self.login_button.place(x=250, y=380)
+        elif mode == "Main":
+            # Code for main page
+            self.root.title("FileEDroP")
+            self.root.geometry("450x560+500+200")
+            self.root.configure(bg="#f4fdfe")
+            self.root.resizable(False, False)
+
+            image_icon = PhotoImage(file="images/file-64.png")
+            self.root.iconphoto(False, image_icon)
+
+            self.send_button_img = PhotoImage(file="images/send-50.png")
+            self.send_button = Button(self.root, image=self.send_button_img, bg="#f4fdfe", bd=0, command=self.on_send_button_click)
+            self.send_button.place(x=50, y=100)
+
+            self.receive_button_img = PhotoImage(file="images/ireceive-64.png")
+            self.receive_button = Button(self.root, image=self.receive_button_img, bg="#f4fdfe", bd=0, command=self.on_receive_button_click)
+            self.receive_button.place(x=300, y=100)
+
+            self.send_label = Label(self.root, text="Send", font=('Acumin Variable Concept', 17, 'bold'), bg="#f4fdfe")
+            self.send_label.place(x=65, y=200)
+
+            self.receive_label = Label(self.root, text="Receive", font=('Acumin Variable Concept', 17, 'bold'), bg="#f4fdfe")
+            self.receive_label.place(x=300, y=200)
+
+            self.background_img = PhotoImage(file="images/Background.png")
+            self.background_label = Label(self.root, image=self.background_img)
+            self.background_label.place(x=-2, y=280)
 
     def on_send_button_click(self):
         send_view = SendView(self.root, FileTransferModel())  # Pass FileTransferModel instance to SendView
@@ -41,11 +73,30 @@ class FileTransferView:
     def on_receive_button_click(self):
         receive_view = ReceiveView(self.root, FileTransferModel())  # Pass FileTransferModel instance to ReceiveView
 
+    def login(self):
+        email = self.emailValue.get()
+        password = self.passValue.get()
+        remember_me = self.checkValue.get()
+
+        # Placeholder for authentication logic
+        # Replace this with your actual authentication logic
+        if email and password:
+            print("Login successful")
+            if remember_me:
+                print("Remember me checked")
+            else:
+                print("Remember me not checked")
+            if self.controller:
+                self.controller.handle_login_sucess()
+        else:
+            print("Login failed")
+
     def run(self):
         self.root.mainloop()
 
 class SendView:
-    def __init__(self, parent, model):
+    def __init__(self, parent, model, filedialog_module=filedialog):
+        self.filedialog = filedialog_module
         self.parent = parent
         self.model = model # Store FileTransferModel instance
         self.filename=None
@@ -80,10 +131,14 @@ class SendView:
         self.progressbar.place(x=75,y=200)
 
     def select_file(self):
-        self.filename = filedialog.askopenfilename(parent=self.window,initialdir=os.getcwd(),
+        filename =self.filedialog.askopenfilename(parent=self.window,initialdir=os.getcwd(),
                                                    title='Select File',
                                                    filetype=(('file type', '*.txt'), ('all files', '*.*')))
-
+        if filename:
+            self.filanme=filename
+            return filename
+        else:
+            return None
     def send_file(self):
         if self.filename:
             with open(self.filename, 'rb') as file:
@@ -151,3 +206,6 @@ class ReceiveView:
         sender_id = self.sender_id_entry.get()
         filename = self.filename_entry.get()
         self.model.receive_file(sender_id, filename)  # Use existing FileTransferModel instance
+if __name__=="__main__":
+    view =FileTransferView()
+    view.run()
