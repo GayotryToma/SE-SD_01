@@ -15,7 +15,7 @@ class FileTransferModel:
         root.destroy()
         return file_path
 
-    def send_file(self,filename,file_data):
+    def send_file(self,filename,file_data,chunk_data=None):
 
         s=socket.socket()
         host=socket.gethostname()
@@ -24,12 +24,13 @@ class FileTransferModel:
         print(host)
         print('waiting for any incoming connections...')
         conn,addr=s.accept()
+        conn.sendall(file_data)
 
 
-
-        with open(filename,'wb') as file:
-                conn.sendall(file_data.getvalue())
-
+        #with open(filename,'wb') as file:
+                #conn.sendall(file_data.getvalue())
+        if chunk_data:
+            conn.sendall(chunk_data)
         print("Data has been transmitted successfully")
 
     def receive_file(self,sender_id,filename):
@@ -59,7 +60,13 @@ class FileTransferModel:
 
 if __name__ == "__main__":
    model = FileTransferModel()
-   model.send_file()
+   filename=model.select_file()
+   if filename:
+       with open(filename,'rb') as file:
+           file_data=file.read()
+           model.send_file(filename,file_data)
+
+
 
 
 
