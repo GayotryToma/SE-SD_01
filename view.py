@@ -124,7 +124,7 @@ class SendView:
         self.select_file_button.place(x=160, y=150)
 
 
-        self.send_button = Button(self.window, text="Send",width=8,height=1 ,font=('arial', 14, 'bold'),bg="#f4fdfe", bd=0, command=self.send_file)
+        self.send_button = Button(self.window, text="Send",width=8,height=1 ,font=('arial', 14, 'bold'),bg="#f4fdfe", bd=0, command=self.send_file_wrapper)
         self.send_button.place(x=300, y=150)
 
         self.progressbar=ttk.Progressbar(self.window,orient="horizontal",length=300,mode="determinate")
@@ -135,11 +135,12 @@ class SendView:
                                                    title='Select File',
                                                    filetype=(('file type', '*.txt'), ('all files', '*.*')))
         if filename:
-            self.filanme=filename
+            self.filename=filename
+            print("Selected file path:", self.filename)
             return filename
         else:
             return None
-    def send_file(self):
+    def send_file_wrapper(self):
         if self.filename:
             with open(self.filename, 'rb') as file:
                 file_data = file.read()  # Read file data
