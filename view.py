@@ -124,38 +124,55 @@ class FileTransferView:
     def run(self):
         self.root.mainloop()
 
-class SendView:
-    def __init__(self, parent, model, filedialog_module=filedialog):
-        self.filedialog = filedialog_module
-        self.parent = parent
-        self.model = model # Store FileTransferModel instance
-        self.filename = None
-        self.window = Toplevel(parent)
-        self.window.title("Send")
-        self.window.geometry(f'450x560+500+200')
-        self.window.configure(bg="#f4fdfe")
-        self.window.resizable(False, False)
+    class SendView:
+        WINDOW_WIDTH = 450
+        WINDOW_HEIGHT = 560
+        WINDOW_X_POS = 500
+        WINDOW_Y_POS = 200
+        BACKGROUND_IMAGE_X_POS = -2
+        BACKGROUND_IMAGE_Y_POS = 0
+        LOGO_X_POS = 10
+        LOGO_Y_POS = 250
+        SELECT_FILE_BUTTON_X_POS = 160
+        SELECT_FILE_BUTTON_Y_POS = 150
+        SEND_BUTTON_X_POS = 300
+        SEND_BUTTON_Y_POS = 150
+        PROGRESSBAR_X_POS = 75
+        PROGRESSBAR_Y_POS = 200
 
-        self.Sbackground = PhotoImage(file="images/sender.png")
-        background_label = Label(self.window, image=self.Sbackground)
-        background_label.place(x=-2, y=0)
+        def __init__(self, parent, model, filedialog_module=filedialog):
+            self.filedialog = filedialog_module
+            self.parent = parent
+            self.model = model
+            self.filename = None
+            self.window = Toplevel(parent)
+            self.window.title("Send")
+            self.window.geometry(f"{self.WINDOW_WIDTH}x{self.WINDOW_HEIGHT}+{self.WINDOW_X_POS}+{self.WINDOW_Y_POS}")
+            self.window.configure(bg="#f4fdfe")
+            self.window.resizable(False, False)
 
-        self.Mbackground = PhotoImage(file="images/id.png")
-        label_image = Label(self.window, image=self.Mbackground, bg="#f4fdfe")
-        label_image.place(x=100, y=260)
+            self.Sbackground = PhotoImage(file="images/sender.png")
+            background_label = Label(self.window, image=self.Sbackground)
+            background_label.place(x=self.BACKGROUND_IMAGE_X_POS, y=self.BACKGROUND_IMAGE_Y_POS)
 
-        host = socket.gethostname()
-        self.host_label = Label(self.window, text=f'ID: {host}', bg='white', fg='black', font='arial 14')
-        self.host_label.place(x=140, y=290)
+            self.Mbackground = PhotoImage(file="images/id.png")
+            label_image = Label(self.window, image=self.Mbackground, bg="#f4fdfe")
+            label_image.place(x=self.LOGO_X_POS, y=self.LOGO_Y_POS)
 
-        self.select_file_button = Button(self.window, text="+ select file", width=10, height=1, font=('arial', 14, 'bold'), bg="#f4fdfe", bd=0, command=self.select_file)
-        self.select_file_button.place(x=160, y=150)
+            host = socket.gethostname()
+            self.host_label = Label(self.window, text=f'ID: {host}', bg='white', fg='black', font='arial 14')
+            self.host_label.place(x=self.LOGO_X_POS + 30, y=self.LOGO_Y_POS + 30)
 
-        self.send_button = Button(self.window, text="Send", width=8, height=1, font=('arial', 14, 'bold'), bg="#f4fdfe", bd=0, command=self.send_file_wrapper)
-        self.send_button.place(x=300, y=150)
+            self.select_file_button = Button(self.window, text="+ select file", width=10, height=1,
+                                             font=('arial', 14, 'bold'), bg="#f4fdfe", bd=0, command=self.select_file)
+            self.select_file_button.place(x=self.SELECT_FILE_BUTTON_X_POS, y=self.SELECT_FILE_BUTTON_Y_POS)
 
-        self.progressbar = ttk.Progressbar(self.window, orient="horizontal", length=300, mode="determinate")
-        self.progressbar.place(x=75, y=200)
+            self.send_button = Button(self.window, text="Send", width=8, height=1, font=('arial', 14, 'bold'),
+                                      bg="#f4fdfe", bd=0, command=self.send_file_wrapper)
+            self.send_button.place(x=self.SEND_BUTTON_X_POS, y=self.SEND_BUTTON_Y_POS)
+
+            self.progressbar = ttk.Progressbar(self.window, orient="horizontal", length=300, mode="determinate")
+            self.progressbar.place(x=self.PROGRESSBAR_X_POS, y=self.PROGRESSBAR_Y_POS)
 
     def select_file(self):
         filename = self.filedialog.askopenfilename(parent=self.window, initialdir=os.getcwd(),
